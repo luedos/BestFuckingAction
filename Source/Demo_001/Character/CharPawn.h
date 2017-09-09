@@ -1,0 +1,78 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "GameFramework/Character.h"
+#include "Projectails/DamageIntarface.h"
+#include "CharPawn.generated.h"
+
+
+UENUM(BlueprintType)		//"BlueprintType" is essential to include
+enum class ETeamEnum : uint8
+{
+	TE_Player 	UMETA(DisplayName = "Player"),
+	TE_Enemy 	UMETA(DisplayName = "Enemy"),
+	TE_Neutral	UMETA(DisplayName = "Neutral")
+};
+
+UCLASS()
+class DEMO_001_API ACharPawn : public ACharacter, public IDamageIntarface
+{
+	GENERATED_BODY()
+
+
+
+public:
+	// Sets default values for this character's properties
+	ACharPawn();
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
+	// Called every frame
+	virtual void Tick( float DeltaSeconds ) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
+
+	UFUNCTION(BlueprintPure, Category = Team)
+	ETeamEnum GetTeam();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Damage)
+		void DoDamage(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType);
+	virtual void DoDamage_Implementation(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType) override;
+
+	UFUNCTION(BlueprintCallable, Category = HP)
+	void DamageHP(float Damage);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = HP)
+	void DeathStatus();
+	//void DeathStatus_Implementation();
+
+	UFUNCTION(BlueprintCallable, Category = Tests)
+	bool TestForVisibilityOnActor(AActor* TestActor);
+
+	UFUNCTION(BlueprintPure, Category = HP)
+	bool GetIsDead();
+
+	UFUNCTION(BlueprintCallable, Category = HP)
+	void SetCanCharBeDamaged(bool NewStatus);
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HP)
+	float HP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HP)
+	float MaxHP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Team)
+	ETeamEnum Team;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HP)
+		bool IsDead;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HP)
+	bool bCanCharBeDamaged;
+
+};
