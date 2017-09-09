@@ -58,8 +58,12 @@ protected:
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Particle)
 	//float DelayInDestroyParticle;
 	//
-	//UPROPERTY(EditAnywhere, Category = Particle)
-	//UParticleSystem* FollowParticle;
+	UPROPERTY(EditAnywhere, Category = Particle)
+	UParticleSystem* FollowParticle;
+	
+
+	UParticleSystemComponent* FollowParticleComponent;
+
 	//
 	//UPROPERTY(EditAnywhere, Category = Particle)
 	//TSubclassOf<AProjParticleHolder> ParticleHolderClass;
@@ -79,6 +83,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = DestroyParticle)
 	UParticleSystem* DestroyParticle;
 
+	UPROPERTY(EditAnywhere, Category = FollowParticle)
+	float DestroyDelay = 0.5f;
+
+	FTimerHandle DestroyTimer;
+
+	void DestroyFunction() { Destroy(); }
 
 	//AProjParticleHolder* MyParticleHolder;
 

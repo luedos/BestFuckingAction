@@ -21,7 +21,6 @@ AProjectail::AProjectail()
 
 	ProjectailMesh->BodyInstance.SetCollisionProfileName("Projactile");
 
-	//ProjectailMesh->OnComponentBeginOverlap.AddDynamic(this, &AProjectail::OnProjBeginOverlap);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = ProjectailMesh;
@@ -44,10 +43,16 @@ void AProjectail::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Begin Play");
+	if (FollowParticle->IsValidLowLevel())
+	{
+		FollowParticleComponent = UGameplayStatics::SpawnEmitterAttached(FollowParticle, ProjectailMesh);
 
-	
-	
+		FollowParticleComponent->BeginTrails("TrailSocket1", "TrailSocket2", ETrailWidthMode::ETrailWidthMode_FromCentre, 1);
+
+		FollowParticleComponent->SetColorParameter("ParticleColor", ProjectailColor);
+	}
+
+
 }
 
 // Called every frame
@@ -172,6 +177,16 @@ void AProjectail::DestroyProjectailItself(FVector SpawnParticlePoint)
 
 	}
 
+	if(FollowParticle->IsValidLowLevel())
+		FollowParticleComponent->SetActive(false);
 
-	Destroy();
+	ProjectailMesh->SetVisibility(false);
+	ProjectailMesh->BodyInstance.SetCollisionProfileName("IgnorAll");
+	ProjectileMovement->Velocity = FVector(0, 0, 0);
+	ProjectileMovement->InitialSpeed = 0.f;
+
+
+
+	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AProjectail::DestroyFunction, DestroyDelay, false);
+	
 }
