@@ -4,6 +4,7 @@
 
 #include "Character/CharPawn.h"
 #include "Objects/Weapons/MC_Weapon.h"
+#include "Projectails/Projectail.h"
 #include "MC_Char.generated.h"
 
 UCLASS()
@@ -169,6 +170,12 @@ protected:
 	//Данная функция запускает объект первой способности
 	void UseDesh();
 
+	UFUNCTION(BlueprintCallable, Category = Spining)
+	void UseSpining();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Desh)
+		void Spining_Event_Implementation();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	bool IsReload;
 
@@ -209,6 +216,16 @@ private:
 	FTimerHandle ChangeWeaponTimer;
 
 
+	// Spining staf -------------------
+
+	void SpiningCicle();
+
+	UFUNCTION(BlueprintCallable, Category = Spining)
+	void StopSpining();
+
+	int NumOfSpining;
+
+
 	//-------------------------------
 	// Desh staf
 
@@ -228,8 +245,17 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Desh)
 		TArray<float> LengthsArray;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spining)
+	float SpiningRadius = 50;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spining)
+	float SpiningTime = 0.5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spining)
+		bool ShowSpiningSphere = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spining)
+	int SpiningStatus = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Desh)
 	float DeshLength;
@@ -244,6 +270,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Desh)
 	float StartDeshSpeed;
 
+	
+
+	
 
 private:
 
@@ -253,7 +282,8 @@ private:
 
 	float ArraySum;
 
-
 	FVector DirectionToDesh;
+
+	FTimerHandle SpiningTimer;
 
 };

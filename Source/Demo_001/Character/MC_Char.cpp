@@ -9,6 +9,7 @@
 #include "Objects/CharSkills/Object_Skills_NormalDesh.h"
 #include "Objects/Weapons/MC_Weapon.h"
 #include "GameFramework/PlayerInput.h"
+
 #include "MC_Char.h"
 
 
@@ -119,6 +120,8 @@ void AMC_Char::SetupPlayerInputComponent(class UInputComponent* InputComp)
 	InputComp->BindAction("Reload", IE_Pressed, this, &AMC_Char::StartReload);
 	
 	InputComp->BindAction("ChangeWeapon", IE_Pressed, this, &AMC_Char::StartChangeWeapon);
+
+	InputComp->BindAction("Spining", IE_Pressed, this, &AMC_Char::UseSpining);
 
 	InputComp->BindAxis("MoveForward", this, &AMC_Char::MoveForward);
 	InputComp->BindAxis("MoveRight", this, &AMC_Char::MoveRight);
@@ -375,9 +378,88 @@ void AMC_Char::UseDesh()
 
 }
 
+void AMC_Char::UseSpining()
+{
+	NumOfSpining = 0;
+	
+	GetWorldTimerManager().SetTimer(SpiningTimer, this, &AMC_Char::SpiningCicle, SpiningTime / 10, true, 0.f);
+
+	Spining_Event_Implementation();
+
+
+}
+
+void AMC_Char::SpiningCicle()
+{
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> TestArray;
+
+	TestArray.Add(EObjectTypeQuery::ObjectTypeQuery7);
+
+	TArray<AActor*> TestActorsToIgnor;
+
+	TestActorsToIgnor.Add(this);
+
+	TArray<FHitResult> TestHitResults;
+
+
+	if(ShowSpiningSphere)
+	UKismetSystemLibrary::SphereTraceMultiForObjects(this, GetActorLocation(), GetActorLocation() + FVector(0, 0, 1), SpiningRadius, TestArray, true, TestActorsToIgnor, EDrawDebugTrace::ForDuration, TestHitResults, true);
+	else
+	UKismetSystemLibrary::SphereTraceMultiForObjects(this, GetActorLocation(), GetActorLocation() + FVector(0, 0, 1), SpiningRadius, TestArray, true, TestActorsToIgnor, EDrawDebugTrace::None, TestHitResults, true);
+
+
+	for (int i = 0; i < TestHitResults.Num(); i++)
+	{
+
+		AProjectail* TestProj = Cast<AProjectail>(TestHitResults[i].GetActor());
+
+		if (TestProj)
+			if (TestProj->ProjectailTeam != ETeamEnum::TE_Player)
+				{
+				FVector ProjVel;
+				switch (SpiningStatus)
+				{
+				case 0:
+				{
+					ProjVel = TestProj->ProjectileMovement->Velocity * (-1);
+					break;
+				}
+				case 1:
+				{
+					ProjVel = (TestProj->GetActorLocation() - GetActorLocation()) / (TestProj->GetActorLocation() - GetActorLocation()).Size() * TestProj->ProjectileMovement->Velocity.Size();
+					break;
+				}
+				case 2:
+				{
+					ProjVel = ((TestProj->GetActorLocation() - GetActorLocation()).Rotation() * 2 + TestProj->GetActorRotation()).Vector() * TestProj->ProjectileMovement->Velocity.Size();
+					break;
+				}
+				default:
+				{
+
+					break;
+				}
+				}
+					TestProj->ProjectileMovement->Velocity = ProjVel;
+					TestProj->bUseTeamVariable = true;
+					TestProj->ProjectailTeam = ETeamEnum::TE_Player;
+				}
+	}
+
+	NumOfSpining += 1;
+
+	if (NumOfSpining > 9)
+		StopSpining();
+}
 
 
 
+void AMC_Char::StopSpining()
+{
+	if (GetWorldTimerManager().IsTimerActive(SpiningTimer))
+		GetWorldTimerManager().ClearTimer(SpiningTimer);
+}
 
 
 void AMC_Char::PrimeFire()
@@ -528,6 +610,8 @@ void AMC_Char::AlternativeFireWayAround()
 
 	//----------------------------------
 	// Desh staf
+
+
 
 void AMC_Char::StartDesh(FVector DirectionToDeshRef)
 {

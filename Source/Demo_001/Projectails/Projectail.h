@@ -14,13 +14,15 @@ class DEMO_001_API AProjectail : public AActor
 {
 	GENERATED_BODY()
 	
+public:
+
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 		class UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(VisibleAnywhere, Category = Projectile)
 		class UStaticMeshComponent* ProjectailMesh;
 
-public:	
+
 	// Sets default values for this actor's properties
 	AProjectail();
 
