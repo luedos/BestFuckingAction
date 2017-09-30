@@ -17,8 +17,8 @@ AAIC_Enemy::AAIC_Enemy()
 
 
 	
-	Sight->SightRadius = 1500;
-	Sight->LoseSightRadius = 2000;
+	Sight->SightRadius = 2500;
+	Sight->LoseSightRadius = 3000;
 	Sight->PeripheralVisionAngleDegrees = 180.0f;
 	Sight->DetectionByAffiliation.bDetectEnemies = true;
 	Sight->DetectionByAffiliation.bDetectNeutrals = true;

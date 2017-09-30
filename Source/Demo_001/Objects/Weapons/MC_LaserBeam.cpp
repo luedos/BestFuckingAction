@@ -189,6 +189,11 @@ bool UMC_LaserBeam::FirstFire(APlayerController * InstigatorFF, FVector PointToS
 				SpawnParticle_BNE(PointToShootFF, EndLocation, bRicoshet);
 
 				BackPackAmmo -= 1;
+
+				if (Char->IsValidLowLevel() && FFSound_Fire->IsValidLowLevel())
+					UGameplayStatics::PlaySoundAtLocation(Char, FFSound_Fire, PointToShootFF);
+
+
 				return true;
 			}
 			return false;

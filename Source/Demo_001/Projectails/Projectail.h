@@ -63,6 +63,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Particle)
 	UParticleSystem* FollowParticle;
 	
+	UPROPERTY(EditAnywhere, Category = Visualisation)
+	USoundBase* ProjDestroySound;
+
 
 	UParticleSystemComponent* FollowParticleComponent;
 

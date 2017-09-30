@@ -185,7 +185,8 @@ void AProjectail::DestroyProjectailItself(FVector SpawnParticlePoint)
 	ProjectileMovement->Velocity = FVector(0, 0, 0);
 	ProjectileMovement->InitialSpeed = 0.f;
 
-
+	if(ProjDestroySound->IsValidLowLevel())
+	UGameplayStatics::SpawnSoundAtLocation(this, ProjDestroySound, GetActorLocation());
 
 	GetWorldTimerManager().SetTimer(DestroyTimer, this, &AProjectail::DestroyFunction, DestroyDelay, false);
 	

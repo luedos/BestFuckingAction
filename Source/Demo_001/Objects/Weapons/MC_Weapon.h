@@ -125,6 +125,7 @@ protected:
 	ACharPawn* Char;
 
 
+
 	//------------------------
 	UPROPERTY(EditAnywhere, Category = Visualisation)
 	UAnimMontage* AnimMontageFF;
@@ -153,6 +154,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Visualisation)
 	UStaticMesh* ShapeMesh;
 
+	UPROPERTY(EditAnywhere, Category = Visualisation)
+	USoundBase* FFSound_Fire;
+
+	UPROPERTY(EditAnywhere, Category = Visualisation)
+	USoundBase* SFSound_Fire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visualisation)
 	UParticleSystem* TrailParticle;

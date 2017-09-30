@@ -114,7 +114,8 @@ bool UMC_Rifle::FirstFire(APlayerController* InstigatorFF, FVector PointToShootF
 					UGameplayStatics::SpawnEmitterAtLocation(Char, FireParticleFF, PointToShootFF, RotToShootFF);
 				}
 
-
+				if (Char->IsValidLowLevel() && FFSound_Fire->IsValidLowLevel())
+					UGameplayStatics::PlaySoundAtLocation(Char, FFSound_Fire, PointToShootFF);
 				Ammo -= 1;
 				return true;
 			}
@@ -227,6 +228,9 @@ bool UMC_Rifle::SecondFire(APlayerController* InstigatorSF, FVector PointToShoot
 				{
 					UGameplayStatics::SpawnEmitterAtLocation(Char, FireParticleSF, PointToShootSF, RotToShootSF);
 				}
+
+				if (Char->IsValidLowLevel() && SFSound_Fire->IsValidLowLevel())
+					UGameplayStatics::PlaySoundAtLocation(Char, SFSound_Fire, PointToShootSF);
 
 				Ammo -= 5;
 				return true;
