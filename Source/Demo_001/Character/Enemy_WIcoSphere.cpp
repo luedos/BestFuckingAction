@@ -5,25 +5,21 @@
 #include "Components/ArrowComponent.h"
 #include "Components/Shield.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Enemy_WIcoSphere.h"
 
 
 AEnemy_WIcoSphere::AEnemy_WIcoSphere()
 {
-	ComponentsFaceArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("FaceArrowComponent"));
-	ComponentsFaceArrow->SetupAttachment(RootComponent);
+
 
 	MaxHP = 250;
 	HP = 250;
 
 	ArrowInterpSpeed = 5;
+
+	ArrowRotSpeed = 360;
 }
 
-void AEnemy_WIcoSphere::ChangeArrowInterpSpeed(float NewSpeed)
-{
-	ArrowInterpSpeed = NewSpeed;
-}
 
 void AEnemy_WIcoSphere::ShieldUp(float InDelay)
 {
@@ -35,9 +31,9 @@ void AEnemy_WIcoSphere::ShieldUp(float InDelay)
 
 	ShieldComponent->OnCreated(this);
 
-	ShieldComponent->AttachToComponent(ComponentsFaceArrow, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	ShieldComponent->AttachToComponent(FaceArrow, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	ShieldComponent->SetWorldRotation(ComponentsFaceArrow->GetComponentRotation());
+	ShieldComponent->SetWorldRotation(FaceArrow->GetComponentRotation());
 
 	ShieldComponent->SetWorldScale3D(FVector(1.4f, 1.4f, 1.4f));
 
@@ -54,22 +50,4 @@ void AEnemy_WIcoSphere::ShieldDown()
 	{
 		ShieldComponent->OnDownBNE();
 	}
-}
-
-
-bool AEnemy_WIcoSphere::InterpFaceArrow(float TimeDelay, FVector ToPoint)
-{
-	if (!IsInDelay)
-	{
-		ComponentsFaceArrow->SetWorldRotation(UKismetMathLibrary::RInterpTo(
-			FRotator(0, ComponentsFaceArrow->GetComponentRotation().Yaw, 0), 
-			FRotator(0, UKismetMathLibrary::FindLookAtRotation(ComponentsFaceArrow->GetComponentLocation(), ToPoint).Yaw, 0), 
-			TimeDelay, ArrowInterpSpeed));
-
-	}
-	else
-		return false;
-
-
-	return true;
 }

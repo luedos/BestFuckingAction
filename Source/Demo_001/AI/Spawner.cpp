@@ -21,6 +21,9 @@ ASpawner::ASpawner()
 
 	SpawnerMesh->BodyInstance.SetCollisionProfileName("PawnMesh");
 
+
+	HP = MaxHP;
+
 }
 
 // Called when the game starts or when spawned
@@ -111,6 +114,17 @@ void ASpawner::ExecuteSpawn()
 		}
 	}
 	AfterSpawn(LocalPositions.Num());
+}
+
+void ASpawner::DoDamage_Implementation(float Damage, APlayerController * CallInstigator, AActor * Couser, EDamageType DamageType)
+{
+	if (IsSpawnerDamagable)
+	{
+		HP -= Damage;
+
+		if (HP <= 0)
+			DeathStatus();
+	}
 }
 
 void ASpawner::AfterSpawn(int NumberOfSpawned)

@@ -18,9 +18,6 @@ class DEMO_001_API AEnemy_WIcoSphere : public AEnemy_Char
 		public:
 
 		AEnemy_WIcoSphere();
-	
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FaceArrow, meta = (AllowPrivateAccess = "true"))
-		class UArrowComponent* ComponentsFaceArrow;
 
 		UFUNCTION(BlueprintCallable, Category = Shield)
 		void ShieldUp(float InDelay);
@@ -31,19 +28,12 @@ class DEMO_001_API AEnemy_WIcoSphere : public AEnemy_Char
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Shield)
 		TSubclassOf<UShield> UsingShield;
 
-		UFUNCTION(BlueprintCallable, Category = FaceArrow)
-		bool InterpFaceArrow(float TimeDelay, FVector ToPoint);
 
-		UFUNCTION(BlueprintCallable, Category = FaceArrow)
-		void ChangeArrowInterpSpeed(float NewSpeed);
 
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Shield)
 	UShield* ShieldComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FaceArrow)
-	float ArrowInterpSpeed;
 
 private:
 

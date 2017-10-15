@@ -6,6 +6,7 @@
 #include "EnvironmentQuery/EnvQuery.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "Character/Enemy_Char.h"
+#include "Projectails/DamageIntarface.h"
 #include "Spawner.generated.h"
 
 
@@ -19,7 +20,7 @@ enum class ESpawnType : uint8
 };
 
 UCLASS()
-class DEMO_001_API ASpawner : public AActor
+class DEMO_001_API ASpawner : public AActor, public IDamageIntarface
 {
 	GENERATED_BODY()
 
@@ -66,6 +67,19 @@ public:
 	UPROPERTY(EditAnywhere, Category = Spawn)
 	float SpawnRadius;
 
+	UPROPERTY(EditAnywhere, Category = Spawn)
+	ETeamEnum MyTeam = ETeamEnum::TE_Enemy;
+
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Damage)
+		void DoDamage(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType);
+	virtual void DoDamage_Implementation(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType) override;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = HP)
+	void DeathStatus();
+
+	bool IsSpawnerDamagable = false;
+
 protected:
 
 	UPROPERTY(EditAnywhere, Category = Particle)
@@ -75,6 +89,11 @@ protected:
 	UParticleSystem* SpawnerSpawnParticle;
 
 	virtual void AfterSpawn(int NumberOfSpawned);
+
+	UPROPERTY(EditAnywhere, Category = Spawner)
+	float MaxHP = 150;
+
+	float HP;
 
 private:
 

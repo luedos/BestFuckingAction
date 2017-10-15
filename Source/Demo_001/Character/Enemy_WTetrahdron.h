@@ -36,10 +36,15 @@ public:
 		void StartDeshBNE(FVector PointDeshRef);
 	virtual void StartDeshBNE_Implementation(FVector PointDeshRef);
 
-
 	UFUNCTION(BlueprintNativeEvent, Category = Test)
 		void StopDeshBNE();
 	virtual void StopDeshBNE_Implementation();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Ray)
+	void StartRay(float PrepareLengthRef, float RayLengthRef, UParticleSystemComponent* ArcParticleRef);
+
+	UFUNCTION(BlueprintPure, Category = Ray)
+		bool GetIsCanRay() { return CanRay; }
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Test)
 	float Coefficient;
@@ -47,9 +52,57 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Test)
 	TArray<float> LengthsArray;
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Ray)
+		void StopRayBNE();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Ray)
+		void TestBNE(ETraceTypeQuery InRef);
+
+	UFUNCTION(BlueprintCallable, Category = Ray)
+		void StopRayCicle();
+
+
+
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = Ray)
+		void StartRayCicle(float RayLengthRef);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Ray)
+		float SetCanRayTrueLength = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ray)
+	float RayLength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ray)
+		float RayDamageRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ray)
+		float RayRotSpeed;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Ray)
+		bool CanRay = true;
+
+	UPROPERTY(EditAnywhere, Category = Ray)
+	UParticleSystem* RayParticle;
+
+	UPROPERTY(BlueprintReadWrite, Category = Ray)
+		UParticleSystemComponent* ArcParticle;
+
 private:
+	void RayCicle();
+
+	FTimerHandle RayTimer;
+	void SetTrueCanRay() { CanRay = true; }
+	float RayTimeLength;
+	UParticleSystemComponent* RayParticleComponent;
+
+
+	float LocalRotationRate;
 
 	FTimerHandle DeshTimer;
+
+	float RayTime;
 
 	float DeshLength;
 	float DeshTime;

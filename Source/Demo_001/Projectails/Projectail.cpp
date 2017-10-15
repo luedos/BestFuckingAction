@@ -5,6 +5,7 @@
 #include "Projectails/DamageIntarface.h"
 #include "Engine.h"
 #include "Projectail.h"
+#include "AI/Spawner.h"
 
 
 // Sets default values
@@ -14,16 +15,19 @@ AProjectail::AProjectail()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ProjectailMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere"));
-
+			
 	RootComponent = ProjectailMesh;
-	
-	ProjectailMesh->BodyInstance.bUseCCD = true;
 
 	ProjectailMesh->BodyInstance.SetCollisionProfileName("Projactile");
+	ProjectailMesh->BodyInstance.bUseCCD = true;
+		
 
+	
+	
+	
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent = ProjectailMesh;
+	ProjectileMovement->UpdatedComponent = RootComponent;
 	ProjectileMovement->InitialSpeed = 2500.f;
 	ProjectileMovement->MaxSpeed = 2500.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
@@ -62,7 +66,7 @@ void AProjectail::Tick( float DeltaTime )
 
 }
 
-void AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult, bool DestroyAfter)
+bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult, bool DestroyAfter)
 {
 	
 		ETeamEnum SelfTeam = ETeamEnum::TE_Neutral;
@@ -99,6 +103,7 @@ void AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 							IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
 							if(DestroyAfter)
 								DestroyProjectailItself(SweepResult.Location);
+							return true;
 						}
 
 						else
@@ -106,6 +111,7 @@ void AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 							IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
 							if (DestroyAfter)
 								DestroyProjectailItself(SweepResult.Location);
+							return true;
 						}
 
 					}
@@ -118,12 +124,28 @@ void AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 						IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
 						if (DestroyAfter)
 							DestroyProjectailItself(SweepResult.Location);
+						return true;
 					}
 					else
 					{
-						IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
-						if (DestroyAfter)
-							DestroyProjectailItself(SweepResult.Location);
+						ASpawner* TestSpawner = Cast<ASpawner>(OtherActor);
+						if (TestSpawner)
+						{
+							if (TestSpawner->MyTeam != SelfTeam)
+							{
+								IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+								if (DestroyAfter)
+									DestroyProjectailItself(SweepResult.Location);
+								return true;
+							}
+						}
+						else
+						{
+							IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+							if (DestroyAfter)
+								DestroyProjectailItself(SweepResult.Location);
+							return true;
+						}
 					}
 
 				}
@@ -136,11 +158,15 @@ void AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 					IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
 					if (DestroyAfter)
 						DestroyProjectailItself(SweepResult.Location);
+
+					return true;
 				}
 
 			}
 
 		}
+
+		return false;
 
 }
 

@@ -60,11 +60,11 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HP)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = HP)
 	float HP;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HP)
-	float MaxHP;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = HP)
+	float MaxHP = 100;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Team)
 	ETeamEnum Team;
@@ -74,5 +74,8 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HP)
 	bool bCanCharBeDamaged;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = HP)
+	FLinearColor CharColor;
 
 };

@@ -16,6 +16,7 @@ class DEMO_001_API AProjectail : public AActor
 	
 public:
 
+
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 		class UProjectileMovementComponent* ProjectileMovement;
 
@@ -43,7 +44,7 @@ public:
 	bool bUseTeamVariable;
 	
 	UFUNCTION(BlueprintCallable, Category = Projectail)
-	void DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult,  bool DestroyAfter = true);
+	bool DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult,  bool DestroyAfter = true);
 
 
 protected:

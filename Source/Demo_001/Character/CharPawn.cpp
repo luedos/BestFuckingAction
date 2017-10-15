@@ -10,8 +10,7 @@ ACharPawn::ACharPawn()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	HP = 100.f;
-	MaxHP = 100.f;
+	HP = MaxHP;
 
 	IsDead = false;
 
