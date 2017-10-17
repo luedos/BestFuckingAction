@@ -5,6 +5,7 @@
 #include "Character/CharPawn.h"
 #include "Objects/Weapons/MC_Weapon.h"
 #include "Projectails/Projectail.h"
+#include "Components/ArrowComponent.h"
 #include "MC_Char.generated.h"
 
 UCLASS()
@@ -49,14 +50,10 @@ public:
 	float CameraInterpLerpAlfa;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	float CameraInterpSpeed;
-	
-
-	//Данная переменная содержит объект способности героя в виде рывка
-	class UObject_Skills* Desh;
 
 	//Переменная показывает вращать камеру в данный момент или нет
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera)
-		bool IsRotateCamera;
+	bool IsRotateCamera;
 
 	//Данные переменные содержат объекты оружий и используются для реализации стрельбы
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Weapon)
@@ -74,53 +71,44 @@ public:
 	UFUNCTION(BlueprintPure, Category = Character)
 	bool GetIsFirstWeapon();
 
-
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void ChangeWeapon();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
 	void ChangeWeapon_BNE();
-	void ChangeWeapon_BNE_Implementation();
-
+	
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void StartChangeWeapon();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
 	void StartChangeWeapon_BNE();
-	void StartChangeWeapon_BNE_Implementation();
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void StopChangeWeapon();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
 	void StopChangeWeapon_BNE();
-	void StopChangeWeapon_BNE_Implementation();
-
+	
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void StartReload();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
 	void StartReload_BNE();
-	virtual void StartReload_BNE_Implementation();
-
+	
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void ReloadWeapon();
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
-		void StopReloading();
+	void StopReloading();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
 	void StopReloading_BNE();
-	virtual void StopReloading_BNE_Implementation();
-	
+		
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	bool GetIsReload();
 
 	UFUNCTION(BlueprintPure, Category = Character)
 	FVector GetCharLookPoint();
-
-	UFUNCTION(BlueprintCallable, Category = TestCategory)
-	float TestFunction(float TestRef);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharMesh)
 	bool IsRotateCharMesh;
@@ -163,9 +151,8 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = Fire)
 	void AlternativeFire();
 	
-	UFUNCTION(BlueprintNativeEvent, Category = Fire)
+	UFUNCTION(BlueprintImplementableEvent, Category = Fire)
 	void FireBNE(UMC_Weapon* Weapon, bool IsPrimeFire, bool FireOrMisfire);
-	virtual void FireBNE_Implementation(UMC_Weapon* Weapon, bool IsPrimeFire, bool FireOrMisfire);
 
 	//Данная функция запускает объект первой способности
 	void UseDesh();
@@ -174,7 +161,7 @@ protected:
 	void UseSpining();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Desh)
-		void Spining_Event_Implementation();
+	void Spining_Event_Implementation();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	bool IsReload;
@@ -186,13 +173,10 @@ protected:
 	float DeshEnemyDelay;
 
 private:
-
 	
-
 	//Функция отвечает за интерполяцию камеры между курсором и ГГ
 	void InterpCamera(float DeltaSeconds);
 	
-
 	//Данные таймеры необходимы для ведения постоянного огня
 	FTimerHandle PrimeFireTimer;
 	FTimerHandle AlternativeFireTimer;
@@ -209,12 +193,10 @@ private:
 
 	//Показывает мышку персонажа
 	FVector CharLookPoint;
-
-
+	
 	FTimerHandle ReloadTimer;
 
 	FTimerHandle ChangeWeaponTimer;
-
 
 	// Spining staf -------------------
 
@@ -224,8 +206,7 @@ private:
 	void StopSpining();
 
 	int NumOfSpining;
-
-
+	
 	//-------------------------------
 	// Desh staf
 
@@ -237,8 +218,7 @@ private:
 	void DeshCicle();
 
 	void StopDesh();
-
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Desh)
 		float Coefficient;
 
@@ -269,11 +249,7 @@ private:
 	float SinHight;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Desh)
 	float StartDeshSpeed;
-
 	
-
-	
-
 private:
 
 	int NumberOfSmallDeshes;

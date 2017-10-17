@@ -28,17 +28,14 @@ public:
 
 	void StopDesh();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Test)
-	void TestFunction();
-	virtual void TestFunction_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent, Category = Test)
+	UFUNCTION(BlueprintImplementableEvent, Category = Test)
 		void StartDeshBNE(FVector PointDeshRef);
-	virtual void StartDeshBNE_Implementation(FVector PointDeshRef);
 
-	UFUNCTION(BlueprintNativeEvent, Category = Test)
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Test)
 		void StopDeshBNE();
-	virtual void StopDeshBNE_Implementation();
+
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Ray)
 	void StartRay(float PrepareLengthRef, float RayLengthRef, UParticleSystemComponent* ArcParticleRef);

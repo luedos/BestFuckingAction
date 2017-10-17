@@ -1,11 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Demo_001.h"
-#include "Projectails/DamageIntarface.h"
-#include "Components/Shield.h"
-#include "Components/KritComponent.h"
 #include "Components/WeaponSMC.h"
-#include "Components/Trail30.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine.h"
 #include "MC_LaserBeam.h"
@@ -43,23 +39,6 @@ bool UMC_LaserBeam::OnCreated(ACharPawn* CharRef)
 			}
 			OnCreated_BNE();
 
-
-			//TrailComponent = NewObject<UTrail30>(Char);
-			//TrailComponent->OnComponentCreated();
-			//TrailComponent->RegisterComponent();
-
-			//TrailComponent->SpawnDelay = 0.06;
-			//TrailComponent->TrailMaterial = TrailMat;
-			//TrailComponent->TrailTimeLength = 0.4f;
-
-			//TrailComponent->StartTrailScale = FVector(1.3f, 1.3f, 1.3f);
-			//TrailComponent->EndTrailScale = FVector(0.4f, 0.4f, 0.4f);
-
-			//TrailComponent->StartColor = StartTrailColor;
-			//TrailComponent->EndColor = EndTrailColor;
-
-			//TrailComponent->StartTrail(SMC->GetComponentsArray(), true, SMC, 0.f, 200, false, 15.f, 1.f);
-
 			return false;
 		}
 		else
@@ -91,13 +70,17 @@ bool UMC_LaserBeam::FirstFire(APlayerController * InstigatorFF, FVector PointToS
 
 				TArray<FHitResult> HitOut;
 
-				FCollisionQueryParams TraceParams(FName(TEXT("VictoreCore Trace")), true, Char);
+				
 
 				FVector EndPoint = PointToShootFF + RotToShootFF.Vector() * FireRange;
 
 				FVector EndLocation = EndPoint;
 
-				World->LineTraceMultiByChannel(HitOut, PointToShootFF, EndPoint, ECC_GameTraceChannel5, TraceParams);
+				//World->LineTraceMultiByChannel(HitOut, PointToShootFF, EndPoint, ECC_GameTraceChannel5, TraceParams);
+				TArray<AActor*> ActorToIgnor;
+
+				UKismetSystemLibrary::SphereTraceMulti_NEW(this, PointToShootFF, EndPoint, 25, 
+					ETraceTypeQuery::TraceTypeQuery3, true, ActorToIgnor, EDrawDebugTrace::None, HitOut, true);
 
 				if (HitOut.Num() != 0)
 				{
@@ -118,14 +101,14 @@ bool UMC_LaserBeam::FirstFire(APlayerController * InstigatorFF, FVector PointToS
 										if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 										{
 											//Тест на компонент
-											IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), 500.f, InstigatorFF, InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
+											IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), 500.f, Char->GetTeam(), InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
 											EndLocation = HitOut[i].Location;
 											break;
 										}
 
 										else
 										{
-											IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), 500.f, InstigatorFF, InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
+											IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), 500.f, Char->GetTeam(), InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
 											EndLocation = HitOut[i].Location;
 											break;
 										}
@@ -137,13 +120,13 @@ bool UMC_LaserBeam::FirstFire(APlayerController * InstigatorFF, FVector PointToS
 								{
 									if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 									{
-										IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), 500.f, InstigatorFF, InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
+										IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), 500.f, Char->GetTeam(), InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
 										EndLocation = HitOut[i].Location;
 										break;
 									}
 									else
 									{
-										IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), 500.f, InstigatorFF, InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
+										IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), 500.f, Char->GetTeam(), InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
 										EndLocation = HitOut[i].Location;
 										break;
 									}
@@ -156,7 +139,7 @@ bool UMC_LaserBeam::FirstFire(APlayerController * InstigatorFF, FVector PointToS
 								if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 								{
 									//Тест на компонент
-									IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), 500.f, InstigatorFF, InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
+									IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), 500.f, Char->GetTeam(), InstigatorFF->GetCharacter(), EDamageType::VE_LaserBeam);
 									EndLocation = HitOut[i].Location;
 									break;
 								}
@@ -246,7 +229,9 @@ void UMC_LaserBeam::Ricochet(APlayerController* FireInstigator,FVector Normal, F
 					FVector TestLocation;
 					FVector EndPoint = UKismetMathLibrary::Multiply_VectorFloat(FRotator(0.f, StartYawRot + StepSize * UKismetMathLibrary::Conv_IntToFloat(i), 0.f).Vector(), RicochetRange) + Point;
 
-					int TestInt = BeamFire(TestObject, TestLocation, Point, EndPoint, ECC_GameTraceChannel5);
+					FVector Start = Point + Normal * 30;
+
+					int TestInt = BeamFire(TestObject, TestLocation, Start, EndPoint, ECC_GameTraceChannel5);
 
 					if (TestInt > DesiredLevel)
 					{
@@ -269,7 +254,7 @@ void UMC_LaserBeam::Ricochet(APlayerController* FireInstigator,FVector Normal, F
 				}
 				if (DesiredObject->IsValidLowLevel() && DesiredObject->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 				{
-					IDamageIntarface::Execute_DoDamage(DesiredObject, 500.f, FireInstigator, FireInstigator->GetCharacter(), EDamageType::VE_LaserBeam);
+					IDamageIntarface::Execute_DoDamage(DesiredObject, 500.f, Char->GetTeam(), FireInstigator->GetCharacter(), EDamageType::VE_LaserBeam);
 					
 				}
 				SpawnParticle_BNE(Point, DesiredLocation, false);
@@ -293,11 +278,16 @@ int UMC_LaserBeam::BeamFire(UObject*& ObjectRef, FVector& ShotedPoint, FVector S
 
 			TArray<FHitResult> HitOut;
 
-			FCollisionQueryParams TraceParams(FName(TEXT("VictoreCore Trace")), true, Char);
+			//FCollisionQueryParams TraceParams(FName(TEXT("VictoreCore Trace")), true, Char);
 
 
 
-			World->LineTraceMultiByChannel(HitOut, Start, End, PrefferedChannel, TraceParams);
+			//World->LineTraceMultiByChannel(HitOut, Start, End, PrefferedChannel, TraceParams);
+
+			TArray<AActor*> ActorToIgnor;
+
+			UKismetSystemLibrary::SphereTraceMulti_NEW(this, Start, End, 25,
+				ETraceTypeQuery::TraceTypeQuery3, true, ActorToIgnor, EDrawDebugTrace::None, HitOut, true);
 
 			if (HitOut.Num() != 0)
 			{

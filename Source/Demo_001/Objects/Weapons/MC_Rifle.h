@@ -4,7 +4,6 @@
 
 #include "Objects/Weapons/MC_Weapon.h"
 #include "Projectails/Projectail.h"
-
 #include "MC_Rifle.generated.h"
 
 /**

@@ -10,17 +10,17 @@ UKritComponent::UKritComponent()
 	KritMultiplier = 4.f;
 }
 
-void UKritComponent::OnKrit(float InDamage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType)
+void UKritComponent::OnKrit(float InDamage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType)
 {
 	if (Char->IsValidLowLevel())
 	{
-		IDamageIntarface::Execute_DoDamage(Char, InDamage * KritMultiplier, CallInstigator, Couser, DamageType);
-		OnKrit_BNE(InDamage, CallInstigator, Couser, DamageType);
+		IDamageIntarface::Execute_DoDamage(Char, InDamage * KritMultiplier, DamageFromTeam, Couser, DamageType);
+		OnKrit_BNE(InDamage, DamageFromTeam, Couser, DamageType);
 	}
 }
-void UKritComponent::DoDamage_Implementation(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType)
+void UKritComponent::DoDamage_Implementation(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType)
 {
-	OnKrit(Damage, CallInstigator, Couser, DamageType);
+	OnKrit(Damage, DamageFromTeam, Couser, DamageType);
 }
 
 void UKritComponent::OnCreatedKC(ACharPawn* CharRef)

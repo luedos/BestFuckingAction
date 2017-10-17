@@ -13,14 +13,6 @@ bool UMC_Weapon::OnCreated(ACharPawn* CharRef)
 }
 
 
-void UMC_Weapon::OnCreated_BNE_Implementation()
-{
-}
-
-void UMC_Weapon::StartTrail_BNE_Implementation()
-{}
-void UMC_Weapon::EndTrail_BNE_Implementation()
-{}
 
 bool UMC_Weapon::FirstFire(APlayerController* InstigatorFF, FVector PointToShootFF, FRotator RotToShootFF)
 {
@@ -31,13 +23,6 @@ bool UMC_Weapon::SecondFire(APlayerController* InstigatorSF, FVector PointToShoo
 {
 	return false;
 }
-
-
-UWeaponSMC* UMC_Weapon::GetSMC()
-{
-	return SMC;
-}
-
 
 void UMC_Weapon::Reload()
 {
@@ -116,18 +101,6 @@ FName UMC_Weapon::GetName()
 	return NameOfTheGun;
 }
 
-UAnimMontage* UMC_Weapon::GetAnimMontage(bool IsPrimeFire)
-{
-	if (IsPrimeFire)
-	{
-		return AnimMontageFF;
-	}
-	else
-	{
-		return AnimMontageSF;
-	}
-}
-
 UParticleSystem* UMC_Weapon::GetFireParticle(bool IsPrimeFire)
 {
 	if (IsPrimeFire)
@@ -145,11 +118,6 @@ float UMC_Weapon::GetReloadRate()
 	return ReloadRate;
 }
 
-UAnimMontage* UMC_Weapon::GetReloadAnimMontage()
-{
-	return ReloadMontage;
-}
-
 bool UMC_Weapon::GetShotGunStyle()
 {
 	return ShotgunStyle;
@@ -163,10 +131,6 @@ UParticleSystem * UMC_Weapon::GetReloadParticle()
 
 void UMC_Weapon::OnDestroy()
 {
-	//if (TrailComponent->IsValidLowLevel())
-	//{
-	//TrailComponent->OnDestroy();
-	//}
 
 	if (SMC->IsValidLowLevel())
 	{
@@ -187,7 +151,4 @@ void UMC_Weapon::OnDestroy()
 	MarkPendingKill();
 }
 
-void UMC_Weapon::SetWeaponColor(FLinearColor NewColor)
-{
-	WeaponColor = NewColor;
-}
+

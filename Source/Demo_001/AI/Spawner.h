@@ -72,8 +72,8 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Damage)
-		void DoDamage(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType);
-	virtual void DoDamage_Implementation(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType) override;
+		void DoDamage(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType);
+	virtual void DoDamage_Implementation(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType) override;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = HP)
 	void DeathStatus();

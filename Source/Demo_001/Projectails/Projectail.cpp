@@ -14,17 +14,18 @@ AProjectail::AProjectail()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ProjectailMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere"));
-			
-	RootComponent = ProjectailMesh;
+	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Proj Collision"));
+	SphereComponent->BodyInstance.bUseCCD = true;
+	RootComponent = SphereComponent;
+	SphereComponent->BodyInstance.SetCollisionProfileName("Projactile");
 
-	ProjectailMesh->BodyInstance.SetCollisionProfileName("Projactile");
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AProjectail::OnComponentBeginOverlap);
+
+	ProjectailMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));	
+	ProjectailMesh->BodyInstance.SetCollisionProfileName("IgnorAll");
 	ProjectailMesh->BodyInstance.bUseCCD = true;
-		
-
 	
-	
-	
+	ProjectailMesh->SetupAttachment(SphereComponent);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = RootComponent;
@@ -66,7 +67,13 @@ void AProjectail::Tick( float DeltaTime )
 
 }
 
-bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult, bool DestroyAfter)
+void AProjectail::OnComponentBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	if(!OverrideOverlapSphere)
+	DamageAfterOverlap(OtherActor, OtherComp, SweepResult, DestroyAfterOverlap);
+}
+
+bool AProjectail::DamageAfterOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult &SweepResult, bool DestroyAfter)
 {
 	
 		ETeamEnum SelfTeam = ETeamEnum::TE_Neutral;
@@ -100,7 +107,7 @@ bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 					{
 						if (OtherComp->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 						{
-							IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+							IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, ProjectailTeam, Char, EDamageType::VE_Bullet);
 							if(DestroyAfter)
 								DestroyProjectailItself(SweepResult.Location);
 							return true;
@@ -108,7 +115,7 @@ bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 						else
 						{
-							IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+							IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, ProjectailTeam, Char, EDamageType::VE_Bullet);
 							if (DestroyAfter)
 								DestroyProjectailItself(SweepResult.Location);
 							return true;
@@ -121,7 +128,7 @@ bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 				{
 					if (OtherComp->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 					{
-						IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+						IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, ProjectailTeam, Char, EDamageType::VE_Bullet);
 						if (DestroyAfter)
 							DestroyProjectailItself(SweepResult.Location);
 						return true;
@@ -133,7 +140,7 @@ bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 						{
 							if (TestSpawner->MyTeam != SelfTeam)
 							{
-								IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+								IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, ProjectailTeam, Char, EDamageType::VE_Bullet);
 								if (DestroyAfter)
 									DestroyProjectailItself(SweepResult.Location);
 								return true;
@@ -141,7 +148,7 @@ bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 						}
 						else
 						{
-							IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+							IDamageIntarface::Execute_DoDamage(OtherActor, ProjectailDamage, ProjectailTeam, Char, EDamageType::VE_Bullet);
 							if (DestroyAfter)
 								DestroyProjectailItself(SweepResult.Location);
 							return true;
@@ -155,7 +162,7 @@ bool AProjectail::DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, A
 			{
 				if (OtherComp->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 				{
-					IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, NULL, Char, EDamageType::VE_Bullet);
+					IDamageIntarface::Execute_DoDamage(OtherComp, ProjectailDamage, ProjectailTeam, Char, EDamageType::VE_Bullet);
 					if (DestroyAfter)
 						DestroyProjectailItself(SweepResult.Location);
 
@@ -187,16 +194,6 @@ void AProjectail::DestroyProjectailItself(FVector SpawnParticlePoint)
 
 		 if (bChangeParticleColor)
 		 {
-			// UMaterialInstanceDynamic* TestMaterial = TestParticle->CreateDynamicMaterialInstance(0, TestParticle->GetMaterial(0));
-			//
-			// TestMaterial->SetVectorParameterValue(FName("Color"), ProjectailColor);
-			//
-			// if (TestParticle->GetMaterial(1)->IsValidLowLevel())
-			// {
-			//	 UMaterialInstanceDynamic* TestMaterial = TestParticle->CreateDynamicMaterialInstance(1, TestParticle->GetMaterial(1));
-			//
-			//	 TestMaterial->SetVectorParameterValue(FName("Color"), ProjectailColor);
-			// }
 			 TestParticle->SetColorParameter("ParticleColor", ProjectailColor);
 		 }
 
@@ -207,7 +204,7 @@ void AProjectail::DestroyProjectailItself(FVector SpawnParticlePoint)
 		FollowParticleComponent->SetActive(false);
 
 	ProjectailMesh->SetVisibility(false);
-	ProjectailMesh->BodyInstance.SetCollisionProfileName("IgnorAll");
+	SphereComponent->BodyInstance.SetCollisionProfileName("IgnorAll");
 	ProjectileMovement->Velocity = FVector(0, 0, 0);
 	ProjectileMovement->InitialSpeed = 0.f;
 

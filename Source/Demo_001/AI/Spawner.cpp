@@ -116,7 +116,7 @@ void ASpawner::ExecuteSpawn()
 	AfterSpawn(LocalPositions.Num());
 }
 
-void ASpawner::DoDamage_Implementation(float Damage, APlayerController * CallInstigator, AActor * Couser, EDamageType DamageType)
+void ASpawner::DoDamage_Implementation(float Damage, ETeamEnum DamageFromTeam, AActor * Couser, EDamageType DamageType)
 {
 	if (IsSpawnerDamagable)
 	{

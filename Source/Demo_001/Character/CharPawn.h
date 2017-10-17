@@ -7,13 +7,7 @@
 #include "CharPawn.generated.h"
 
 
-UENUM(BlueprintType)		//"BlueprintType" is essential to include
-enum class ETeamEnum : uint8
-{
-	TE_Player 	UMETA(DisplayName = "Player"),
-	TE_Enemy 	UMETA(DisplayName = "Enemy"),
-	TE_Neutral	UMETA(DisplayName = "Neutral")
-};
+
 
 UCLASS()
 class DEMO_001_API ACharPawn : public ACharacter, public IDamageIntarface
@@ -39,15 +33,14 @@ public:
 	ETeamEnum GetTeam();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Damage)
-		void DoDamage(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType);
-	virtual void DoDamage_Implementation(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType) override;
+		void DoDamage(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType);
+	virtual void DoDamage_Implementation(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType) override;
 
 	UFUNCTION(BlueprintCallable, Category = HP)
 	void DamageHP(float Damage);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = HP)
 	void DeathStatus();
-	//void DeathStatus_Implementation();
 
 	UFUNCTION(BlueprintCallable, Category = Tests)
 	bool TestForVisibilityOnActor(AActor* TestActor);

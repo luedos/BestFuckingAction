@@ -23,6 +23,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Projectile)
 		class UStaticMeshComponent* ProjectailMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Reflector)
+		USphereComponent* SphereComponent;
 
 	// Sets default values for this actor's properties
 	AProjectail();
@@ -43,9 +45,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (DisplayName = "UseTeamVar", ExposeOnSpawn = true), Category = Team)
 	bool bUseTeamVariable;
 	
-	UFUNCTION(BlueprintCallable, Category = Projectail)
-	bool DamageAfterOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult,  bool DestroyAfter = true);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectail)
+	bool DestroyAfterOverlap = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectail)
+	bool OverrideOverlapSphere = false;
+
+	UFUNCTION(BlueprintCallable, Category = Projectail)
+	bool DamageAfterOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult &SweepResult, bool DestroyAfter);
+
+	UFUNCTION()
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 
 protected:
 
@@ -55,27 +65,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestroyParticle)
 	bool bChangeParticleColor;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Particle)
-	//bool bCreateParticleActor;
-	//
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Particle)
-	//float DelayInDestroyParticle;
-	//
 	UPROPERTY(EditAnywhere, Category = Particle)
 	UParticleSystem* FollowParticle;
 	
 	UPROPERTY(EditAnywhere, Category = Visualisation)
 	USoundBase* ProjDestroySound;
 
-
 	UParticleSystemComponent* FollowParticleComponent;
-
-	//
-	//UPROPERTY(EditAnywhere, Category = Particle)
-	//TSubclassOf<AProjParticleHolder> ParticleHolderClass;
-	//
-	//UPROPERTY(EditAnywhere, Category = Particle)
-	//FVector ScaleParticleHolder = FVector(1, 1, 1);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DestroyParticle)
 	bool bUseActorRotation;
@@ -95,7 +91,5 @@ protected:
 	FTimerHandle DestroyTimer;
 
 	void DestroyFunction() { Destroy(); }
-
-	//AProjParticleHolder* MyParticleHolder;
 
 };

@@ -2,14 +2,9 @@
 
 #include "Demo_001.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Components/ArrowComponent.h"
-#include "Character/Enemy_Char.h"
 #include "Engine.h"
-#include "Objects/CharSkills/Object_Skills.h"
-#include "Objects/CharSkills/Object_Skills_NormalDesh.h"
-#include "Objects/Weapons/MC_Weapon.h"
+#include "Character/Enemy_Char.h"
 #include "GameFramework/PlayerInput.h"
-
 #include "MC_Char.h"
 
 
@@ -38,10 +33,6 @@ AMC_Char::AMC_Char()
 	CameraInterpSpeed = 10.f;
 	CameraInterpLerpAlfa = 0.4f;
 
-	Desh = CreateDefaultSubobject<UObject_Skills_NormalDesh>(TEXT("Skill to Desh"));
-
-	
-
 	IsRotateCamera = false;
 	CanPrimeFire = true;
 	CanAlternativeFire = true;
@@ -69,9 +60,7 @@ AMC_Char::AMC_Char()
 	InterpWalkSpeedValue = 7.f;
 
 	PercentOfValue = 0.7f;
-
-
-
+	
 	DeshLength = 800.f;
 	DeshTime = 0.15f;
 	NumberOfSmallDeshes = 40;
@@ -92,7 +81,6 @@ void AMC_Char::BeginPlay()
 {
 	Super::BeginPlay();
 	ChangeWeapon();
-	//GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 }
 
 // Called every frame
@@ -182,9 +170,6 @@ void AMC_Char::InterpCamera(float DeltaSeconds)
 	}
 }
 
-
-
-
 FRotator AMC_Char::GetCharRotation()
 {
 	return CharRotation;
@@ -195,10 +180,6 @@ FVector AMC_Char::GetCharLookPoint()
 	return CharLookPoint;
 }
 
-float AMC_Char::TestFunction(float TestRef)
-{
-	return UKismetMathLibrary::Sin(TestRef);
-}
 
 bool AMC_Char::GetIsFirstWeapon()
 {
@@ -209,18 +190,7 @@ void AMC_Char::ChangeWeapon()
 {
 	
 	if (UKismetMathLibrary::SelectObject(FirstWeapon, SecondWeapon, !IsFirstWeapon)->IsValidLowLevel())
-	{
-		if (IsFirstWeapon)
-		{
-			FirstWeapon->EndTrail_BNE();
-			SecondWeapon->StartTrail_BNE();
-		}
-		else
-		{
-			FirstWeapon->StartTrail_BNE();
-			SecondWeapon->EndTrail_BNE();
-		}
-		
+	{		
 		IsFirstWeapon = !IsFirstWeapon;
 		ChangeWeapon_BNE();
 	}
@@ -230,8 +200,6 @@ void AMC_Char::ChangeWeapon()
 	}
 }
 
-void AMC_Char::ChangeWeapon_BNE_Implementation()
-{}
 
 void AMC_Char::StartChangeWeapon()
 {
@@ -243,24 +211,15 @@ void AMC_Char::StartChangeWeapon()
 	}
 }
 
-void AMC_Char::StartChangeWeapon_BNE_Implementation()
-{}
-
 void AMC_Char::StopChangeWeapon()
 {
 	GetWorldTimerManager().ClearTimer(ChangeWeaponTimer);
 	StopChangeWeapon_BNE();
 }
 
-void AMC_Char::StopChangeWeapon_BNE_Implementation()
-{}
-
-void AMC_Char::StartReload_BNE_Implementation()
-{}
 
 void AMC_Char::StartReload()
 {
-
 	if(!GetWorldTimerManager().IsTimerActive(ReloadTimer) && !GetWorldTimerManager().IsTimerActive(ChangeWeaponTimer))
 	{ 
 
@@ -298,7 +257,6 @@ void AMC_Char::StartReload()
 
 void AMC_Char::ReloadWeapon()
 {
-
 	if (IsFirstWeapon)
 	{
 		if (FirstWeapon->IsValidLowLevel())
@@ -312,8 +270,6 @@ void AMC_Char::ReloadWeapon()
 	IsReload = false;
 }
 
-void AMC_Char::StopReloading_BNE_Implementation()
-{}
 
 void AMC_Char::StopReloading()
 {
@@ -329,35 +285,16 @@ bool AMC_Char::GetIsReload()
 
 void AMC_Char::MoveForward(float Value)
 {
-	//if ((Controller != NULL) && (Value != 0.0f))
-	//{
-	//	AddMovementInput(CameraRotationArrow->GetForwardVector(), Value);
-	//}
-
 	ForwardMoveValue = Value;
 }
 
 void AMC_Char::MoveRight(float Value)
 {
-	//if ((Controller != NULL) && (Value != 0.0f))
-	//{
-	//	AddMovementInput(CameraRotationArrow->GetRightVector(), Value);
-	//}
-
 	RightMoveValue = Value;
 }
 
-
-
-
-
-void AMC_Char::FireBNE_Implementation(UMC_Weapon * Weapon, bool IsPrimeFire, bool FireOrMisfire)
-{
-}
-
 void AMC_Char::UseDesh()
-{
-	
+{	
 	FVector TestVector = FVector(0, 0, 0);
 	float TestValue = 0;
 
@@ -372,10 +309,6 @@ void AMC_Char::UseDesh()
 	Desh_Event_Implementation(TestVector);
 
 	StartDesh(TestVector);
-
-	//Desh->UseSkill_Implementation(this, 10000.f, 1000.f, TestVector);
-
-
 }
 
 void AMC_Char::UseSpining()
@@ -385,13 +318,10 @@ void AMC_Char::UseSpining()
 	GetWorldTimerManager().SetTimer(SpiningTimer, this, &AMC_Char::SpiningCicle, SpiningTime / 10, true, 0.f);
 
 	Spining_Event_Implementation();
-
-
 }
 
 void AMC_Char::SpiningCicle()
 {
-
 	TArray<TEnumAsByte<EObjectTypeQuery>> TestArray;
 
 	TestArray.Add(EObjectTypeQuery::ObjectTypeQuery7);
@@ -401,14 +331,12 @@ void AMC_Char::SpiningCicle()
 	TestActorsToIgnor.Add(this);
 
 	TArray<FHitResult> TestHitResults;
-
-
+	
 	if(ShowSpiningSphere)
 	UKismetSystemLibrary::SphereTraceMultiForObjects(this, GetActorLocation(), GetActorLocation() + FVector(0, 0, 1), SpiningRadius, TestArray, true, TestActorsToIgnor, EDrawDebugTrace::ForDuration, TestHitResults, true);
 	else
 	UKismetSystemLibrary::SphereTraceMultiForObjects(this, GetActorLocation(), GetActorLocation() + FVector(0, 0, 1), SpiningRadius, TestArray, true, TestActorsToIgnor, EDrawDebugTrace::None, TestHitResults, true);
-
-
+	
 	for (int i = 0; i < TestHitResults.Num(); i++)
 	{
 
@@ -454,17 +382,14 @@ void AMC_Char::SpiningCicle()
 }
 
 
-
 void AMC_Char::StopSpining()
 {
 	if (GetWorldTimerManager().IsTimerActive(SpiningTimer))
 		GetWorldTimerManager().ClearTimer(SpiningTimer);
 }
 
-
 void AMC_Char::PrimeFire()
 {
-
 	if (UKismetMathLibrary::SelectObject(FirstWeapon, SecondWeapon, IsFirstWeapon)->IsValidLowLevel())
 	{
 		if (CanPrimeFire)
@@ -667,12 +592,7 @@ void AMC_Char::DeshCicle()
 	UWorld* World = GetWorld();
 	if (World != NULL)
 	{
-
-
-
 		DirectionToDesh = DirectionToDesh / DirectionToDesh.Size();
-
-
 		FVector Start = GetActorLocation();
 		FVector End = Start + DirectionToDesh * 60.f;
 

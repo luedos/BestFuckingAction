@@ -20,16 +20,16 @@ public:
 	UKritComponent();
 
 	UFUNCTION(BlueprintCallable, Category = Krit)
-	void OnKrit(float InDamage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType);
+	void OnKrit(float InDamage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType);
 
 
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = Krit)
-	void OnKrit_BNE(float InDamage_BNE, APlayerController* CallInstigator_BNE, AActor* Couser_BNE, EDamageType DamageType_BNE);
+	void OnKrit_BNE(float InDamage_BNE, ETeamEnum DamageFromTeam, AActor* Couser_BNE, EDamageType DamageType_BNE);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = Damage)
-		void DoDamage(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType);
-	virtual void DoDamage_Implementation(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType) override;
+		void DoDamage(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType);
+	virtual void DoDamage_Implementation(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType) override;
 
 	UFUNCTION(BlueprintCallable, Category = OnCreated)
 	void OnCreatedKC(ACharPawn* CharRef);

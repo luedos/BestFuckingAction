@@ -114,7 +114,7 @@ bool ACharPawn::GetIsDead()
 	return IsDead;
 }
 
-void ACharPawn::DoDamage_Implementation(float Damage, APlayerController* CallInstigator, AActor* Couser, EDamageType DamageType)
+void ACharPawn::DoDamage_Implementation(float Damage, ETeamEnum DamageFromTeam, AActor* Couser, EDamageType DamageType)
 {
 
 }

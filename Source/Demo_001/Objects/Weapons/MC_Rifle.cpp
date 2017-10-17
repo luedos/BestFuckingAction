@@ -1,12 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Demo_001.h"
-
-#include "Projectails/FastBullet.h"
-#include "Projectails/DamageIntarface.h"
-#include "Components/WeaponSMC.h"
-#include "Components/Shield.h"
-#include "Components/Trail30.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine.h"
 #include "MC_Rifle.h"
@@ -55,24 +49,6 @@ bool UMC_Rifle::OnCreated(ACharPawn* CharRef)
 			}
 				OnCreated_BNE();
 			
-			//TrailComponent = NewObject<UTrail30>(Char);
-			//TrailComponent->OnComponentCreated();
-			//TrailComponent->RegisterComponent();
-
-			//TrailComponent->SpawnDelay = 0.2;
-			//TrailComponent->TrailMaterial = TrailMat;
-			//TrailComponent->TrailTimeLength = 0.4f;
-
-			//TrailComponent->StartTrailScale = FVector(1.2f, 1.2f, 1.2f);
-			//TrailComponent->EndTrailScale = FVector(0.2f, 0.2f, 0.2f);
-
-
-			//TrailComponent->StartColor = StartTrailColor;
-			//TrailComponent->EndColor = EndTrailColor;
-
-
-			//TrailComponent->StartTrail(SMC->GetComponentsArray(), true, SMC, 0.f, 30, false, 0.f, 0.f);
-
 			return true;
 		}
 		else
@@ -194,21 +170,14 @@ bool UMC_Rifle::SecondFire(APlayerController* InstigatorSF, FVector PointToShoot
 								ItemsFound++;
 							}
 						}
-						IDamageIntarface::Execute_DoDamage(TestActor, ItemsFound * SFDamage, InstigatorSF, InstigatorSF->GetCharacter(), EDamageType::VE_ShotGun);
+						IDamageIntarface::Execute_DoDamage(TestActor, ItemsFound * SFDamage, Char->GetTeam(), InstigatorSF->GetCharacter(), EDamageType::VE_ShotGun);
 
 						ACharacter* TestChar = Cast<ACharacter>(TestActor);
 						if(TestChar)
 							if (DamageParticleSF->IsValidLowLevel())
 							{
 
-							
-								//UGameplayStatics::SpawnEmitterAttached(DamageParticleSF,
-								//	TestChar->GetMesh(), 
-								//	FVector(0, 0, 0),
-								//	FRotator(0, 0, 0),
-								//	EAttachLocation::SnapToTarget);
-
-								UParticleSystemComponent* TestParticle = UGameplayStatics::SpawnEmitterAtLocation(TestChar->GetWorld(), 
+									UParticleSystemComponent* TestParticle = UGameplayStatics::SpawnEmitterAtLocation(TestChar->GetWorld(), 
 									DamageParticleSF, 
 									TestChar->GetMesh()->GetComponentLocation(), 
 									TestChar->GetMesh()->GetComponentRotation());

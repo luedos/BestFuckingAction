@@ -60,8 +60,6 @@ void AEnemy_WTetrahdron::StartDesh(FVector PointToDeshRef)
 			World->GetTimerManager().SetTimer(DeshTimer, this, &AEnemy_WTetrahdron::DeshCicle, DeshTime / NumberOfSmallDeshes, true, DeshTime / NumberOfSmallDeshes);
 
 			StartDeshBNE(PointToDeshRef);
-
-			TestFunction();
 		}
 	}
 	
@@ -124,17 +122,8 @@ void AEnemy_WTetrahdron::StopDesh()
 	}
 }
 
-void AEnemy_WTetrahdron::TestFunction_Implementation()
-{
-}
 
-void AEnemy_WTetrahdron::StartDeshBNE_Implementation(FVector PointDeshRef)
-{
-}
 
-void AEnemy_WTetrahdron::StopDeshBNE_Implementation()
-{
-}
 
 void AEnemy_WTetrahdron::StopRayCicle()
 {
@@ -148,6 +137,9 @@ void AEnemy_WTetrahdron::StopRayCicle()
 		RayParticleComponent->DestroyComponent();
 		if (ArcParticle->IsValidLowLevel())
 			ArcParticle->DestroyComponent();
+
+		SetCanCharBeDamaged(true);
+
 		StopRayBNE();
 	}
 }
@@ -181,7 +173,9 @@ void AEnemy_WTetrahdron::RayCicle()
 
 	TArray<AActor*> ActorToIgnor;
 
-	UKismetSystemLibrary::SphereTraceMulti_NEW(this, GetActorLocation(), GetActorLocation() + FaceArrow->GetComponentRotation().Vector() * RayLength, 35, ETraceTypeQuery::TraceTypeQuery3, true, ActorToIgnor, EDrawDebugTrace::None, HitOut, true);
+	UKismetSystemLibrary::SphereTraceMulti_NEW(this, GetActorLocation() + FaceArrow->GetComponentRotation().Vector() * 50,
+		GetActorLocation() + FaceArrow->GetComponentRotation().Vector() * RayLength, 25,
+		ETraceTypeQuery::TraceTypeQuery3, true, ActorToIgnor, EDrawDebugTrace::None, HitOut, true);
 
 	if (RayParticleComponent->IsValidLowLevel())
 		RayParticleComponent->SetBeamTargetPoint(0, GetActorLocation() + FaceArrow->GetComponentRotation().Vector() * RayLength, 0);
@@ -202,7 +196,7 @@ void AEnemy_WTetrahdron::RayCicle()
 							if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 							{
 								//Тест на компонент
-								IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), RayDamageRate * 0.005f, NULL, this, EDamageType::VE_LaserBeam);
+								IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), RayDamageRate * 0.005f, GetTeam(), this, EDamageType::VE_LaserBeam);
 								if (RayParticleComponent->IsValidLowLevel())
 									RayParticleComponent->SetBeamTargetPoint(0, HitOut[i].ImpactPoint, 0);
 								break;
@@ -210,7 +204,7 @@ void AEnemy_WTetrahdron::RayCicle()
 
 							else
 							{
-								IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), RayDamageRate * 0.005f, NULL, this, EDamageType::VE_LaserBeam);
+								IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), RayDamageRate * 0.005f, GetTeam(), this, EDamageType::VE_LaserBeam);
 								if (RayParticleComponent->IsValidLowLevel())
 									RayParticleComponent->SetBeamTargetPoint(0, HitOut[i].ImpactPoint, 0);
 								break;
@@ -223,14 +217,14 @@ void AEnemy_WTetrahdron::RayCicle()
 					{
 						if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 						{
-							IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), RayDamageRate * 0.005f, NULL, this, EDamageType::VE_LaserBeam);
+							IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), RayDamageRate * 0.005f, GetTeam(), this, EDamageType::VE_LaserBeam);
 							if (RayParticleComponent->IsValidLowLevel())
 								RayParticleComponent->SetBeamTargetPoint(0, HitOut[i].ImpactPoint, 0);
 							break;
 						}
 						else
 						{
-							IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), RayDamageRate * 0.005f, NULL, this, EDamageType::VE_LaserBeam);
+							IDamageIntarface::Execute_DoDamage(HitOut[i].GetActor(), RayDamageRate * 0.005f, GetTeam(), this, EDamageType::VE_LaserBeam);
 							if (RayParticleComponent->IsValidLowLevel())
 								RayParticleComponent->SetBeamTargetPoint(0, HitOut[i].ImpactPoint, 0);
 							break;
@@ -244,7 +238,7 @@ void AEnemy_WTetrahdron::RayCicle()
 					if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 					{
 						//Тест на компонент
-						IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), RayDamageRate * 0.005f, NULL, this, EDamageType::VE_LaserBeam);
+						IDamageIntarface::Execute_DoDamage(HitOut[i].GetComponent(), RayDamageRate * 0.005f, GetTeam(), this, EDamageType::VE_LaserBeam);
 						if (RayParticleComponent->IsValidLowLevel())
 							RayParticleComponent->SetBeamTargetPoint(0, HitOut[i].ImpactPoint, 0);
 						break;
