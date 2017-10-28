@@ -11,20 +11,31 @@ void ATimerSpawner::Spawn()
 
 	if (World != NULL)
 	{
-		LocalSpawnNumber = 0;
 		if (World->GetTimerManager().IsTimerActive(SpawnTimer))
 			World->GetTimerManager().ClearTimer(SpawnTimer);
-		World->GetTimerManager().SetTimer(SpawnTimer, this, &ASpawner::ExecuteSpawn, SpawnRate, true, 0.f);
+		LocalSpawnNumber = 0;
+		ExecuteSpawn();
 	}
 }
 
 
 void ATimerSpawner::AfterSpawn(int NumberOfSpawned)
 {
-	if (NumberOfSpawn != 0)
+	UWorld* World = GetWorld();
+
+	if (World != NULL)
 	{
-		LocalSpawnNumber++;
-		if (LocalSpawnNumber >= NumberOfSpawn)
-			GetWorldTimerManager().ClearTimer(SpawnTimer);
+		float Rand = FMath::FRandRange(0, RandomInRate);
+
+		if (NumberOfSpawn != 0)
+		{
+			LocalSpawnNumber++;
+			if (LocalSpawnNumber >= NumberOfSpawn)
+				World->GetTimerManager().SetTimer(SpawnTimer, this, &ASpawner::ExecuteSpawn, SpawnRate + Rand, false, SpawnRate + Rand);
+		}
+		else
+		{
+			World->GetTimerManager().SetTimer(SpawnTimer, this, &ASpawner::ExecuteSpawn, SpawnRate + Rand, false, SpawnRate + Rand);
+		}
 	}
 }

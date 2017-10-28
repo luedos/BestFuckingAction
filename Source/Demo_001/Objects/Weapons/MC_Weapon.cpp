@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Demo_001.h"
+#include "PickUps/WeaponPickUp.h"
 #include "MC_Weapon.h"
 
 
@@ -50,6 +51,22 @@ void UMC_Weapon::AddAmmo(int AmmoToAdd)
 	{
 		BackPackAmmo = MaxBackPackAmmo;
 	}
+}
+
+void UMC_Weapon::SetAmmo(int AmmoToSet)
+{
+	if (AmmoToSet > MaxAmmo)
+		Ammo = MaxAmmo;
+	else
+		Ammo = AmmoToSet;
+}
+
+void UMC_Weapon::SetBackAmmo(int AmmoToSet)
+{
+	if (AmmoToSet > MaxBackPackAmmo)
+		BackPackAmmo = MaxBackPackAmmo;
+	else
+		BackPackAmmo = AmmoToSet;
 }
 
 ACharacter * UMC_Weapon::GetChar()
@@ -152,3 +169,34 @@ void UMC_Weapon::OnDestroy()
 }
 
 
+void UMC_Weapon::SpawnPickUp(FVector Location)
+{
+	if (MyWeaponPickUp->IsValidLowLevel())
+	{
+
+
+		if (Char->IsValidLowLevel())
+		{
+			UWorld* World = Char->GetWorld();
+			if (World != NULL)
+			{
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = Char;
+				SpawnParams.Instigator = Char;
+				
+				APickUp* TestPickUp = World->SpawnActor<APickUp>(MyWeaponPickUp, FTransform(FRotator(0, 0, 0), Location, FVector(0, 0, 0)),SpawnParams);
+				
+				AWeaponPickUp* MyPickUp = Cast<AWeaponPickUp>(TestPickUp);
+				if (MyPickUp)
+				{
+					MyPickUp->PickUpAmmo = Ammo;
+					MyPickUp->PickUpBackPackAmmo = BackPackAmmo;
+				}
+
+				
+			}
+		}
+	}
+
+}

@@ -80,8 +80,11 @@ bool ACharPawn::TestForVisibilityOnActor(AActor* TestActor)
 							}
 							else
 							{
-								IsSucsess = false;
-								break;
+								if (HitOut[i].bBlockingHit)
+								{
+									IsSucsess = false;
+									break;
+								}
 							}
 						}
 						else

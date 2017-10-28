@@ -113,6 +113,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharMesh)
 	bool IsRotateCharMesh;
 
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	bool DoesHasWeapon(TSubclassOf<UMC_Weapon> WeaponToCheck) {
+
+		if (FirstWeapon->IsValidLowLevel())
+			if (FirstWeapon->GetClass() == WeaponToCheck)
+				return true;
+
+		if (SecondWeapon->IsValidLowLevel())
+			if (SecondWeapon->GetClass() == WeaponToCheck)
+				return true;
+
+		return false;
+	}
+
 protected:
 
 	/** Called for forwards/backward input */
@@ -210,7 +224,7 @@ private:
 	//-------------------------------
 	// Desh staf
 
-	protected:
+protected:
 
 	UFUNCTION(BlueprintCallable, Category = AISkills)
 		void StartDesh(FVector DirectionToDeshRef);
@@ -249,8 +263,19 @@ private:
 	float SinHight;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Desh)
 	float StartDeshSpeed;
-	
+
+	bool IsCanSpining() { return !GetWorldTimerManager().IsTimerActive(ReloadSpiningTimer); }
+	bool IsCanDesh() { return !GetWorldTimerManager().IsTimerActive(ReloadDeshTimer); }
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Desh)
+	float DeshReloadTime = 0.5;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spining)
+	float SpiningReloadTime = 0.5;
+
 private:
+
+	FTimerHandle ReloadSpiningTimer;
+	FTimerHandle ReloadDeshTimer;
 
 	int NumberOfSmallDeshes;
 	int CountOfSmallDeshes;

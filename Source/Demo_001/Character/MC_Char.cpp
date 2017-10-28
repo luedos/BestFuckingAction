@@ -36,7 +36,7 @@ AMC_Char::AMC_Char()
 	IsRotateCamera = false;
 	CanPrimeFire = true;
 	CanAlternativeFire = true;
-	IsFirstWeapon = false;
+	IsFirstWeapon = true;
 
 	IsRotateCharMesh = true;
 
@@ -80,7 +80,7 @@ AMC_Char::AMC_Char()
 void AMC_Char::BeginPlay()
 {
 	Super::BeginPlay();
-	ChangeWeapon();
+	//ChangeWeapon();
 }
 
 // Called every frame
@@ -295,29 +295,28 @@ void AMC_Char::MoveRight(float Value)
 
 void AMC_Char::UseDesh()
 {	
-	FVector TestVector = FVector(0, 0, 0);
-	float TestValue = 0;
-
-	if (ForwardMoveValue != 0 || RightMoveValue != 0)
+	if ((ForwardMoveValue != 0 || RightMoveValue != 0) && IsCanDesh())
 	{
-		TestValue = 1;
+		FVector TestVector = CameraRotationArrow->GetForwardVector() * ForwardMoveValue + CameraRotationArrow->GetRightVector() * RightMoveValue;
+		
+		Desh_Event_Implementation(TestVector);
+
+		StartDesh(TestVector);
 	}
-
-	TestVector = TestVector + CameraRotationArrow->GetForwardVector() * ForwardMoveValue;
-	TestVector = TestVector + CameraRotationArrow->GetRightVector() * RightMoveValue;
-
-	Desh_Event_Implementation(TestVector);
-
-	StartDesh(TestVector);
 }
 
 void AMC_Char::UseSpining()
 {
-	NumOfSpining = 0;
-	
-	GetWorldTimerManager().SetTimer(SpiningTimer, this, &AMC_Char::SpiningCicle, SpiningTime / 10, true, 0.f);
+	if (IsCanSpining())
+	{
+		NumOfSpining = 0;
 
-	Spining_Event_Implementation();
+		GetWorldTimerManager().SetTimer(SpiningTimer, this, &AMC_Char::SpiningCicle, SpiningTime / 10, true, 0.f);
+
+		Spining_Event_Implementation();
+
+		GetWorldTimerManager().SetTimer(ReloadSpiningTimer, SpiningReloadTime, false, SpiningReloadTime);
+	}
 }
 
 void AMC_Char::SpiningCicle()
@@ -390,56 +389,46 @@ void AMC_Char::StopSpining()
 
 void AMC_Char::PrimeFire()
 {
-	if (UKismetMathLibrary::SelectObject(FirstWeapon, SecondWeapon, IsFirstWeapon)->IsValidLowLevel())
+	UMC_Weapon* WeaponToUse;
+	if (IsFirstWeapon)
+		WeaponToUse = FirstWeapon;
+	else
+		WeaponToUse = SecondWeapon;
+
+	if (WeaponToUse->IsValidLowLevel())
 	{
 		if (CanPrimeFire)
 		{
-			if (IsFirstWeapon)
-			{
-				if (FirstWeapon->GetShotGunStyle() || !IsReload)
+				if (WeaponToUse->GetShotGunStyle() || !IsReload)
 				{
 					FVector PointToShot = RootComponent->GetComponentLocation() + GetCharRotation().Vector()*100.f;
-					if (FirstWeapon->FirstFire(UGameplayStatics::GetPlayerController(GetWorld(), 0), PointToShot, GetCharRotation()))
+					if (WeaponToUse->FirstFire(UGameplayStatics::GetPlayerController(GetWorld(), 0), PointToShot, GetCharRotation()))
 					{
-						FireBNE(FirstWeapon, true, true);
+						FireBNE(WeaponToUse, true, true);
 						StopReloading();
 					}
 					else
 					{
 						GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("FirstWeapon: OUT OF AMMO!"));
-						FireBNE(FirstWeapon, true, false);
+						FireBNE(WeaponToUse, true, false);
 					}
 					CanPrimeFire = false;
-					GetWorldTimerManager().SetTimer(PrimeFireTimer, this, &AMC_Char::PrimeFireWayAround, FirstWeapon->GetFirstFireRate(), false);
+					GetWorldTimerManager().SetTimer(PrimeFireTimer, this, &AMC_Char::PrimeFireWayAround, WeaponToUse->GetFirstFireRate(), false);
 				}
-			}
-			else
-			{
-				if (SecondWeapon->GetShotGunStyle() || !IsReload)
-				{
-					FVector PointToShot = RootComponent->GetComponentLocation() + GetCharRotation().Vector()*100.f;
-					if (SecondWeapon->FirstFire(UGameplayStatics::GetPlayerController(GetWorld(), 0), PointToShot, GetCharRotation()))
-					{
-						FireBNE(SecondWeapon, true, true);
-						StopReloading();
-					}
-					else
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("SecondWeapon: OUT OF AMMO!"));
-						FireBNE(SecondWeapon, true, false);
-					}
-					CanPrimeFire = false;
-					GetWorldTimerManager().SetTimer(PrimeFireTimer, this, &AMC_Char::PrimeFireWayAround, SecondWeapon->GetFirstFireRate(), false);
-				}
-			}
 		}
 	}
 }
 
 void AMC_Char::PrimeFireWayAround()
 {
+	UMC_Weapon* WeaponToUse;
+	if (IsFirstWeapon)
+		WeaponToUse = FirstWeapon;
+	else
+		WeaponToUse = SecondWeapon;
+
 	CanPrimeFire = true;
-	if (FirstWeapon->GetIsFA())
+	if (WeaponToUse->GetIsFA())
 	{
 		bool IsKeyDown = false;
 		TArray<FInputActionKeyMapping> KeysArray = UGameplayStatics::GetPlayerController(GetWorld(), 0)->PlayerInput->GetKeysForAction("PrimeFire");
@@ -462,50 +451,33 @@ void AMC_Char::PrimeFireWayAround()
 
 void AMC_Char::AlternativeFire()
 {
-	if (UKismetMathLibrary::SelectObject(FirstWeapon, SecondWeapon, IsFirstWeapon)->IsValidLowLevel())
+	UMC_Weapon* WeaponToUse;
+	if (IsFirstWeapon)
+		WeaponToUse = FirstWeapon;
+	else
+		WeaponToUse = SecondWeapon;
+
+	if (WeaponToUse->IsValidLowLevel())
 	{
 		if(CanAlternativeFire)
 		{
-			if (IsFirstWeapon)
-			{
-				if (FirstWeapon->GetShotGunStyle() || !IsReload)
+				if (WeaponToUse->GetShotGunStyle() || !IsReload)
 				{
 					FVector PointToShot = RootComponent->GetComponentLocation() + GetCharRotation().Vector()*100.f;
-					if (FirstWeapon->SecondFire(UGameplayStatics::GetPlayerController(GetWorld(), 0), PointToShot, GetCharRotation()))
+					if (WeaponToUse->SecondFire(UGameplayStatics::GetPlayerController(GetWorld(), 0), PointToShot, GetCharRotation()))
 					{
-						FireBNE(FirstWeapon, false, true);
+						FireBNE(WeaponToUse, false, true);
 						StopReloading();
 					}
 					else
 					{
 						GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("FirstWeapon: OUT OF AMMO!"));
-						FireBNE(FirstWeapon, false, false);
+						FireBNE(WeaponToUse, false, false);
 					}
 
 					CanAlternativeFire = false;
-					GetWorldTimerManager().SetTimer(AlternativeFireTimer, this, &AMC_Char::AlternativeFireWayAround, FirstWeapon->GetSecondFireRate(), false);
+					GetWorldTimerManager().SetTimer(AlternativeFireTimer, this, &AMC_Char::AlternativeFireWayAround, WeaponToUse->GetSecondFireRate(), false);
 				}
-			}
-			else 
-			{
-				if (SecondWeapon->GetShotGunStyle() || !IsReload)
-				{
-					FVector PointToShot = RootComponent->GetComponentLocation() + GetCharRotation().Vector()*100.f;
-					if (SecondWeapon->SecondFire(UGameplayStatics::GetPlayerController(GetWorld(), 0), PointToShot, GetCharRotation()))
-					{
-						FireBNE(SecondWeapon, false, true);
-						StopReloading();
-					}
-					else
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, TEXT("SecondWeapon: OUT OF AMMO!"));
-						FireBNE(SecondWeapon, false, false);
-					}
-
-					CanAlternativeFire = false;
-					GetWorldTimerManager().SetTimer(AlternativeFireTimer, this, &AMC_Char::AlternativeFireWayAround, SecondWeapon->GetSecondFireRate(), false);
-				}
-			}
 		}
 	}
 }
@@ -514,7 +486,13 @@ void AMC_Char::AlternativeFireWayAround()
 {
 	CanAlternativeFire = true;
 
-	if (FirstWeapon->GetIsSA())
+	UMC_Weapon* WeaponToUse;
+	if (IsFirstWeapon)
+		WeaponToUse = FirstWeapon;
+	else
+		WeaponToUse = SecondWeapon;
+
+	if (WeaponToUse->GetIsSA())
 	{
 		bool IsKeyDown = false;
 		TArray<FInputActionKeyMapping> KeysArray = UGameplayStatics::GetPlayerController(GetWorld(), 0)->PlayerInput->GetKeysForAction("AlternativeFire");
@@ -582,6 +560,8 @@ void AMC_Char::StartDesh(FVector DirectionToDeshRef)
 						TestActor->StartEnemyDelay(DeshEnemyDelay);
 				}
 			}
+
+			World->GetTimerManager().SetTimer(ReloadDeshTimer, DeshReloadTime, false, DeshReloadTime);
 		}
 	}
 

@@ -46,6 +46,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = Spawn)
 	TSubclassOf<AEnemy_Char> EnemyToSpawn;
 
+	UPROPERTY(EditAnywhere, Category = Spawn)
+	float SpawnDelay = 0.5;
+	UPROPERTY(EditAnywhere, Category = Spawn)
+	bool SpawnWithDelay = false;
+
+	UParticleSystemComponent* SpawnWithParticle(float ParticleTime, FVector LocationToSpawn);
+
 	void ExecuteSpawn();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spawn)
@@ -83,7 +90,7 @@ public:
 protected:
 
 	UPROPERTY(EditAnywhere, Category = Particle)
-	UParticleSystem* EnemySpawnParticle;
+	UParticleSystem* SpawnParticle;
 
 	UPROPERTY(EditAnywhere, Category = Particle)
 	UParticleSystem* SpawnerSpawnParticle;
@@ -96,6 +103,12 @@ protected:
 	float HP;
 
 private:
+
+	void SpawnByTimer();
+
+	TArray<FVector> TimerLocations;
+
+	TArray<FTimerHandle> ParticleTimers;
 
 	TArray<FVector> LocalPositions;
 };

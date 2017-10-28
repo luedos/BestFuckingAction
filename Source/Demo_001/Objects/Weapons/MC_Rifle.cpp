@@ -243,6 +243,8 @@ UObject* UMC_Rifle::MultiTrace(FVector StartPointToShoot, FVector EndPointToShoo
 				TraceParams.TraceTag = TraceTag;
 			}
 
+			FVector FinaleLocation = EndPointToShoot;
+
 			World->LineTraceMultiByChannel(HitOut, StartPointToShoot, EndPointToShoot, PrefferedChannel, TraceParams);
 
 			if (HitOut.Num() != 0)
@@ -262,12 +264,14 @@ UObject* UMC_Rifle::MultiTrace(FVector StartPointToShoot, FVector EndPointToShoo
 									{
 										//Тест на компонент
 										FinaleObject = HitOut[i].GetComponent();
+										FinaleLocation = HitOut[i].ImpactPoint;
 										break;
 									}
 
 									else
 									{
 										FinaleObject = HitOut[i].GetActor();
+										FinaleLocation = HitOut[i].ImpactPoint;
 										break;
 									}
 
@@ -278,12 +282,14 @@ UObject* UMC_Rifle::MultiTrace(FVector StartPointToShoot, FVector EndPointToShoo
 							{
 								if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 								{
-									FinaleObject = HitOut[i].GetComponent();					
+									FinaleObject = HitOut[i].GetComponent();
+									FinaleLocation = HitOut[i].ImpactPoint;
 									break;
 								}
 								else
 								{
-									FinaleObject = HitOut[i].GetActor();							
+									FinaleObject = HitOut[i].GetActor();	
+									FinaleLocation = HitOut[i].ImpactPoint;
 									break;
 								}
 
@@ -295,13 +301,15 @@ UObject* UMC_Rifle::MultiTrace(FVector StartPointToShoot, FVector EndPointToShoo
 							if (HitOut[i].GetComponent()->GetClass()->ImplementsInterface(UDamageIntarface::StaticClass()))
 							{
 								//Тест на компонент
-								FinaleObject = HitOut[i].GetComponent();					
+								FinaleObject = HitOut[i].GetComponent();	
+								FinaleLocation = HitOut[i].ImpactPoint;
 								break;
 							}
 							else
 							{
 								if (HitOut[i].bBlockingHit)
 								{
+									FinaleLocation = HitOut[i].ImpactPoint;
 									break;
 								}
 							}
@@ -311,6 +319,7 @@ UObject* UMC_Rifle::MultiTrace(FVector StartPointToShoot, FVector EndPointToShoo
 					{
 						if (HitOut[i].bBlockingHit)
 						{
+							FinaleLocation = HitOut[i].ImpactPoint;
 							break;
 						}
 					}
@@ -319,6 +328,12 @@ UObject* UMC_Rifle::MultiTrace(FVector StartPointToShoot, FVector EndPointToShoo
 
 			}
 
+			if (ShotGunRayParticle->IsValidLowLevel())
+			{
+				UParticleSystemComponent* TestParticle = UGameplayStatics::SpawnEmitterAtLocation(World, ShotGunRayParticle, StartPointToShoot);
+				TestParticle->SetBeamTargetPoint(0, FinaleLocation, 0);
+				
+			}
 		}
 	}
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "PickUps/PickUp.h"
+#include "Objects/Weapons/MC_Weapon.h"
 #include "WeaponPickUp.generated.h"
 
 /**
@@ -26,8 +27,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
+	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = PickUp)
+	//	void PickUpFunc(ACharPawn* FromChar);
+	void PickUpFunc_Implementation(ACharPawn* FromChar) override;
+	
+	UPROPERTY(EditAnywhere, Category = Weapon)
+	int PickUpAmmo;
+	UPROPERTY(EditAnywhere, Category = Weapon)
+	int PickUpBackPackAmmo;
 
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<UMC_Weapon> WeaponObject;
 	
 };

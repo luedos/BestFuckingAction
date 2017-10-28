@@ -33,7 +33,7 @@ void APickUp::Tick( float DeltaTime )
 
 }
 
-void APickUp::PickUp(AActor * ActorWhichPickUp)
+void APickUp::PickUpFunc_Implementation(ACharPawn* FromChar)
 {
 
 }

@@ -53,6 +53,27 @@ void ASpawner::Spawn()
 
 
 
+UParticleSystemComponent * ASpawner::SpawnWithParticle(float ParticleTime, FVector LocationToSpawn)
+{
+	UParticleSystemComponent* LocalParticle = nullptr;
+
+	UWorld* World = GetWorld();
+	
+	if (World != NULL)
+	{
+		if (SpawnParticle->IsValidLowLevel())
+			LocalParticle = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SpawnParticle, LocationToSpawn, GetActorRotation());
+
+
+		ParticleTimers.Add(FTimerHandle());
+		TimerLocations.Add(LocationToSpawn);
+
+		World->GetTimerManager().SetTimer(ParticleTimers.Last(), this, &ASpawner::SpawnByTimer, ParticleTime);
+
+	}
+	return LocalParticle;
+}
+
 void ASpawner::ExecuteSpawn()
 {
 	
@@ -79,23 +100,6 @@ void ASpawner::ExecuteSpawn()
 		break;
 	}
 			
-	
-	//else
-	//{
-	//	TArray<FVector> LocalArray;
-	//
-	//	MyQueryRequest->Execute(EEnvQueryRunMode::RandomBest5Pct, this, &ASpawner::MyQueryFinished);
-	//	for (int i = 0; i < 3; i++)
-	//	{
-	//		int LocalInt = FMath::RandRange(0, float(LocalPositions.Num()) - 0.1);
-	//
-	//		LocalArray.Add(LocalPositions[LocalInt]);
-	//
-	//		LocalPositions.RemoveAt(i);
-	//	}
-	//
-	//	LocalPositions = LocalArray;
-	//}
 	if(SpawnerSpawnParticle->IsValidLowLevel())
 		UParticleSystemComponent* TestSpawnParticle = UGameplayStatics::SpawnEmitterAtLocation(this, SpawnerSpawnParticle, GetActorLocation(), GetActorRotation(), true);
 
@@ -108,9 +112,13 @@ void ASpawner::ExecuteSpawn()
 
 		for (int i = 0; i < LocalPositions.Num(); i++)
 		{
-			World->SpawnActor<AEnemy_Char>(EnemyToSpawn, LocalPositions[i], GetActorRotation(), SpawnParams);
-			if (EnemySpawnParticle->IsValidLowLevel())
-				UParticleSystemComponent* TestParticle = UGameplayStatics::SpawnEmitterAtLocation(this, EnemySpawnParticle, LocalPositions[i], GetActorRotation(), true);
+			if (SpawnWithDelay)
+				SpawnWithParticle(SpawnWithDelay, LocalPositions[i]);
+			else {
+				World->SpawnActor<AEnemy_Char>(EnemyToSpawn, LocalPositions[i], GetActorRotation(), SpawnParams);
+				if (SpawnParticle->IsValidLowLevel())
+					UParticleSystemComponent* TestParticle = UGameplayStatics::SpawnEmitterAtLocation(this, SpawnParticle, LocalPositions[i], GetActorRotation(), true);
+			}
 		}
 	}
 	AfterSpawn(LocalPositions.Num());
@@ -129,6 +137,25 @@ void ASpawner::DoDamage_Implementation(float Damage, ETeamEnum DamageFromTeam, A
 
 void ASpawner::AfterSpawn(int NumberOfSpawned)
 {
+}
+
+void ASpawner::SpawnByTimer()
+{
+	UWorld* World = GetWorld();
+	if (World != NULL)
+		for (int i = 0; i < ParticleTimers.Num(); i++)
+			if (!World->GetTimerManager().IsTimerActive(ParticleTimers[i]))
+			{
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Instigator = NULL;
+				SpawnParams.Owner = this;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+				World->SpawnActor<AEnemy_Char>(EnemyToSpawn, LocalPositions[i], GetActorRotation(), SpawnParams);
+				AfterSpawn(1);
+				break;
+			}
+	
+
 }
 
 //void ASpawner::MyQueryFinished(TSharedPtr<FEnvQueryResult> Result)

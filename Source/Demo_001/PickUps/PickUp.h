@@ -3,10 +3,11 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "PickUpInterface.h"
 #include "PickUp.generated.h"
 
 UCLASS()
-class DEMO_001_API APickUp : public AActor
+class DEMO_001_API APickUp : public AActor, public IPickUpInterface
 {
 	GENERATED_BODY()
 
@@ -25,13 +26,16 @@ public:
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
-
-	virtual void PickUp(AActor* ActorWhichPickUp);
 	
 	UFUNCTION(BlueprintPure, Category = PickUp)
 	bool GetCanPickUp();
 	UFUNCTION(BlueprintCallable, Category = PickUp)
 	void SetCanPickUp(bool NewPickUpState);
+
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = PickUp)
+		void PickUpFunc(ACharPawn* FromChar);
+	virtual void PickUpFunc_Implementation(ACharPawn* FromChar) override;
 
 private:
 

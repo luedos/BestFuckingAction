@@ -16,6 +16,8 @@ class DEMO_001_API ATimerSpawner : public ASpawner
 	
 public:
 
+	ATimerSpawner() : SpawnRate(1), RandomInRate(0) {}
+
 	UFUNCTION(BlueprintCallable, Category = Spawn)
 	void Spawn() override;
 	
@@ -25,6 +27,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spawn)
 	float SpawnRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spawn)
+	float RandomInRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spawn)
 	int NumberOfSpawn = 0;

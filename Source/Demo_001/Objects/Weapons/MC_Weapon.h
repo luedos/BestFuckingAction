@@ -9,6 +9,7 @@
 #include "Projectails/DamageIntarface.h"
 #include "Components/KritComponent.h"
 #include "Components/WeaponSMC.h"
+#include "PickUps/PickUp.h"
 #include "MC_Weapon.generated.h"
 
 /**
@@ -20,6 +21,9 @@ class DEMO_001_API UMC_Weapon : public UObject
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintCallable, Category = PickUp)
+	void SpawnPickUp(FVector Location);
 
 	UFUNCTION(BlueprintCallable, Category = Statistic)
 	virtual bool OnCreated(ACharPawn* CharRef);
@@ -39,6 +43,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = Ammo)
 	void AddAmmo(int AmmoToAdd);
+
+	void SetAmmo(int AmmoToSet);
+
+	void SetBackAmmo(int AmmoToSet);
 
 	UFUNCTION(BlueprintPure, Category = Statistic)
 	ACharacter* GetChar();
@@ -128,7 +136,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Visualisation)
 	bool ShotgunStyle;
 
-	UPROPERTY(EditAnywhere, Category = Visualisation)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visualisation)
 	UStaticMesh* GunMesh;
 	UPROPERTY(EditAnywhere, Category = Visualisation)
 	UStaticMesh* ShapeMesh;
@@ -160,5 +168,8 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = Visualisation)
 	TArray<UParticleSystemComponent*> ParticlesArray;
+
+	UPROPERTY(EditAnywhere, Category = PickUp)
+	TSubclassOf<APickUp> MyWeaponPickUp;
 
 };

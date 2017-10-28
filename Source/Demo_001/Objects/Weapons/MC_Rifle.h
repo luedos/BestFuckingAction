@@ -53,6 +53,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visualisation)
 	UParticleSystem* DamageParticleSF;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Visualisation)
+		UParticleSystem* ShotGunRayParticle;
+
 private:
 
 	UObject* MultiTrace(FVector StartPointToShoot, FVector EndPointToShoot, ECollisionChannel PrefferedChannel);
